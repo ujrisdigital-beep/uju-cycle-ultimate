@@ -1,0 +1,145 @@
+# Local / Air-gapped mode with Ollama (no OpenAI API key needed)
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=llama3.1:8b
+    restart: unless-stopped
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: uju
+      POSTGRES_PASSWORD: uju_secret
+      POSTGRES_DB: uju_cycle
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uju"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  ingestor:
+    build: ../backend/ingestor
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+      OPENAI_API_KEY: ""
+      OLLAMA_URL: http://ollama:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  diviner:
+    build: ../backend/diviner
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+      OPENAI_API_KEY: ""
+      OLLAMA_URL: http://ollama:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  lens-shifter:
+    build: ../backend/lens-shifter
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+      OPENAI_API_KEY: ""
+      OLLAMA_URL: http://ollama:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  pattern-weaver:
+    build: ../backend/pattern-weaver
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  critic:
+    build: ../backend/critic
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  explainer:
+    build: ../backend/explainer
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_URL: postgresql://uju:uju_secret@postgres:5432/uju_cycle
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ingestor
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  ollama_data:

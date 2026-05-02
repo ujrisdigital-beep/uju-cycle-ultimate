@@ -1,0 +1,27 @@
+{
+  "dashboard": {
+    "title": "UJU Cycle Live v4 — System Metrics",
+    "panels": [
+      {
+        "title": "Request Rate (req/s)",
+        "targets": [{"expr": "rate(uju_ingest_requests_total[1m])"}]
+      },
+      {
+        "title": "P99 Latency (s)",
+        "targets": [{"expr": "histogram_quantile(0.99, rate(uju_ingest_latency_seconds_bucket[1m]))"}]
+      },
+      {
+        "title": "API Key Usage by Tier",
+        "targets": [{"expr": "sum(uju_ingest_tokens_total) by (tier)"}]
+      },
+      {
+        "title": "Circuit Breaker State",
+        "targets": [{"expr": "uju_circuit_breaker_state"}]
+      },
+      {
+        "title": "Krippendorff's Alpha (Inter-Lens Agreement)",
+        "targets": [{"expr": "uju_krippendorff_alpha"}]
+      }
+    ]
+  }
+}

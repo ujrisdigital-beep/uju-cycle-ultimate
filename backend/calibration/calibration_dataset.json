@@ -1,0 +1,39 @@
+{
+  "problems": [
+    {
+      "id": "c001",
+      "domain": "healthcare",
+      "query_text": "Why do surgical site infections persist despite sterile protocols?",
+      "expert_answer": "Communication gaps during handoffs and inconsistent adherence to protocols across shifts cause persistent SSIs, not the protocols themselves.",
+      "ground_truth_confidence": 0.92
+    },
+    {
+      "id": "c002",
+      "domain": "software",
+      "query_text": "Why do microservice deployments fail in the first month?",
+      "expert_answer": "Distributed transaction management failures and lack of idempotent operations cause cascading failures in microservice deployments.",
+      "ground_truth_confidence": 0.87
+    },
+    {
+      "id": "c003",
+      "domain": "education",
+      "query_text": "Why do students forget 90% of lecture content within a week?",
+      "expert_answer": "Lack of active recall, spaced repetition, and contextual application causes rapid forgetting of lecture-only content.",
+      "ground_truth_confidence": 0.89
+    },
+    {
+      "id": "c004",
+      "domain": "business",
+      "query_text": "Why do 70% of digital transformation projects fail?",
+      "expert_answer": "Poor change management, lack of executive sponsorship, and misalignment between IT and business goals drive digital transformation failures.",
+      "ground_truth_confidence": 0.85
+    },
+    {
+      "id": "c005",
+      "domain": "climate",
+      "query_text": "Why do carbon offset programs often fail to deliver promised reductions?",
+      "expert_answer": "Additionality problems, non-permanent sequestration, and lack of verification cause carbon offsets to underdeliver on promised reductions.",
+      "ground_truth_confidence": 0.88
+    }
+  ]
+}
