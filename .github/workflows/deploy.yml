@@ -29,4 +29,4 @@ jobs:
           echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Ensure uju-cycle.com alias is set
-        run: vercel alias set ${{ steps.deploy.outputs.url }} uju-cycle.com --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel alias set ${{ steps.deploy.outputs.url }} uju-cycle.com --token=${{ secrets.VERCEL_TOKEN }} || true
